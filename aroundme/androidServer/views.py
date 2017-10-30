@@ -8,6 +8,7 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 from .models import User, SessionHandel, SOSRequest, SOSRequestResolver
 from math import sin, cos, sqrt, atan2, radians
+import json
 
 
 class SOSRequestHandler(View):
@@ -125,7 +126,7 @@ def update_lat_long(request):
     if request.method == "GET":
         payload = request.GET
     else:
-        payload = request.POST
+        payload = json.loads(request.body.decode('utf-8'))
 
     token = payload.get('token')
     lat = payload.get('latitude')
@@ -144,7 +145,7 @@ def post_sos_request(request):
     if request.method == "GET":
         payload = request.GET
     else:
-        payload = request.POST
+        payload = json.loads(request.body.decode('utf-8'))
 
     token = payload.get('token')
     message = payload.get('message')
@@ -152,7 +153,6 @@ def post_sos_request(request):
     request = SOSRequest(message=message, user=handler.user)
     request.save()
     return JsonResponse({"RequestId": request.id})
-    return JsonResponse({})
 
 
 @method_decorator(csrf_exempt)
@@ -166,17 +166,3 @@ def delete_sos_request(request):
     SOSRequest.objects.filter(user=user).delete()
     return HttpResponse("SOS Request successfully deleted!")
     print(e)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
