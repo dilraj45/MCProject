@@ -86,7 +86,7 @@ def get_allocated_sos_requests(request):
 def authenticate_user_credentials(request):
     if request.method == "GET":
         raise Http404
-    payload = request.POST
+    payload = json.loads(request.body.decode('utf-8'))
     username = payload.get('username')
     password = payload.get('password')
     try:
@@ -106,7 +106,7 @@ def authenticate_user_credentials(request):
 def save_user_credentials(request):
     if request.method == "GET":
         raise Http404
-    payload = request.POST
+    payload = json.loads(request.body.decode('utf-8'))
     username = payload.get('username')
     password = payload.get('password')
     contact = payload.get('contact')
@@ -160,7 +160,7 @@ def delete_sos_request(request):
     if request.method == "GET":
         payload = request.GET
     else:
-        payload = request.POST
+        payload = json.loads(request.body.decode('utf-8'))
     token = payload.get('token')
     user = SessionHandel.objects.get(authentication_token=token).user
     SOSRequest.objects.filter(user=user).delete()
