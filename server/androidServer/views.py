@@ -6,7 +6,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
-from .models import User, SessionHandel, SOSRequest, SOSRequestResolver
+from .models import User, SessionHandle, SOSRequest, SOSRequestResolver
 from math import sin, cos, sqrt, atan2, radians
 import json
 
@@ -43,7 +43,7 @@ def get_open_sos_requests(request):
     distance = payload.get('distance', default=1)
     open_sos_requests = []
     try:
-        user = SessionHandel.objects.get(authentication_token = auth_token).user
+        user = SessionHandle.objects.get(authentication_token = auth_token).user
         allocated_sos_request = []
         for resolve_request in SOSRequestResolver.objects.filter(user=user.id):
             allocated_sos_request.append(resolve_request.sos_request)
@@ -69,7 +69,7 @@ def get_allocated_sos_requests(request):
     auth_token = payload.get('token')
     allocated_sos_request = []
     try:
-        user = SessionHandel.objects.get(authentication_token=auth_token).user
+        user = SessionHandle.objects.get(authentication_token=auth_token).user
         for resolve_request in SOSRequestResolver.objects.filter(user=user.id):
             json_response = {
                 'message': resolve_request.sos_request.message,
@@ -77,7 +77,7 @@ def get_allocated_sos_requests(request):
                 'contact': resolve_request.user.contact
             }
             allocated_sos_request.append(json_response)
-    except SessionHandel.DoesNotExist as e:
+    except SessionHandle.DoesNotExist as e:
         print(e)
     return JsonResponse({"AllocatedSOSRequests": allocated_sos_request})
 
@@ -94,7 +94,7 @@ def authenticate_user_credentials(request):
         if password == user.password:
             # todo: change token to uuid to avoid collision or add exception handling
             token = get_random_string(length=32)
-            session = SessionHandel( user=user, authentication_token=token)
+            session = SessionHandle(user=user, authentication_token=token)
             session.save()
             return JsonResponse({'token':token})
     except User.DoesNotExist as e:
@@ -131,7 +131,7 @@ def update_lat_long(request):
     token = payload.get('token')
     lat = payload.get('latitude')
     long = payload.get('longitude')
-    session_handel = SessionHandel.objects.get(authentication_token=token)
+    session_handel = SessionHandle.objects.get(authentication_token=token)
     user = session_handel.user
     user.latitude = lat
     user.longitude = long
@@ -149,7 +149,7 @@ def post_sos_request(request):
 
     token = payload.get('token')
     message = payload.get('message')
-    handler = SessionHandel.objects.get(authentication_token=token)
+    handler = SessionHandle.objects.get(authentication_token=token)
     request = SOSRequest(message=message, user=handler.user)
     request.save()
     return JsonResponse({"RequestId": request.id})
@@ -162,7 +162,7 @@ def delete_sos_request(request):
     else:
         payload = json.loads(request.body.decode('utf-8'))
     token = payload.get('token')
-    user = SessionHandel.objects.get(authentication_token=token).user
+    user = SessionHandle.objects.get(authentication_token=token).user
     SOSRequest.objects.filter(user=user).delete()
     return HttpResponse("SOS Request successfully deleted!")
     print(e)

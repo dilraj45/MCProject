@@ -27,7 +27,7 @@ class SOSRequestResolver(models.Model):
         unique_together = ['user', 'sos_request']
 
 
-class SessionHandel(models.Model):
+class SessionHandle(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     authentication_token = models.CharField(max_length=32, unique=True)

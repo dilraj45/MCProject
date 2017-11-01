@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, SessionHandel, SOSRequest, SOSRequestResolver
+from .models import User, SessionHandle, SOSRequest, SOSRequestResolver
 # Register your models here.
 
 
@@ -16,7 +16,7 @@ class SessionHandelAdmin(admin.ModelAdmin):
     list_display = ('id', 'user_id', 'authentication_token')
 
 
-admin.site.register(SessionHandel, SessionHandelAdmin)
+admin.site.register(SessionHandle, SessionHandelAdmin)
 admin.site.register(SOSRequest, SOSRequestAdmin)
 admin.site.register(SOSRequestResolver, SOSRequestResolverAdmin)
 admin.site.register(User, UserAdmin)
