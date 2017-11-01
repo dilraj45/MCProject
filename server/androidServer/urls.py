@@ -5,5 +5,6 @@ from .views import save_user_credentials, update_lat_long, post_sos_request, del
 urlpatterns = [
     #url(r'^$', SOSRequestHandler.as_view())
     url(r'^PostSOSRequest/$', post_sos_request),
-    url(r'^UpdateLocation/$', update_lat_long)
+    url(r'^UpdateLocation/$', update_lat_long),
+    url(r'DeleteSOSRequest/$', delete_sos_request)
 ]
