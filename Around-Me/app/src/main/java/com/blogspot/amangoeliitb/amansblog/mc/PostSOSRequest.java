@@ -20,7 +20,7 @@ import com.blogspot.amangoeliitb.amansblog.R;
  */
 public class PostSOSRequest extends AppCompatActivity {
 
-    private String HOST = "172.31.68.121:8000";
+    private String HOST = "ec2-52-15-178-137.us-east-2.compute.amazonaws.com";
     private final String TAG = "PostSOSRequest";
 
     @Override

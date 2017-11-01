@@ -17,7 +17,7 @@ import org.json.JSONObject;
 
 public class LocationUpdateService extends IntentService {
 
-    private final String HOST = "172.31.68.121:8000";
+    private final String HOST = "ec2-52-15-178-137.us-east-2.compute.amazonaws.com";
     private final String TAG = "LocationUpdateService";
 
     public LocationUpdateService() {
