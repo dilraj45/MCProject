@@ -1,4 +1,6 @@
 from decimal import Decimal
+
+from django.db import IntegrityError
 from django.http import Http404
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
@@ -93,12 +95,15 @@ def authenticate_user_credentials(request):
         user = User.objects.get(username=username)
         if password == user.password:
             # todo: change token to uuid to avoid collision or add exception handling
-            token = get_random_string(length=32)
-            session = SessionHandle(user=user, authentication_token=token)
-            session.save()
-            return JsonResponse({'token':token})
+            session = SessionHandle.objects.get(user=user)
+            return JsonResponse({'token':session.authentication_token})
     except User.DoesNotExist as e:
         print(e)
+    except SessionHandle.DoesNotExist:
+        token = get_random_string(length=32)
+        session = SessionHandle(user=user, authentication_token=token)
+        session.save()
+        return JsonResponse({'token':token})
     return JsonResponse({})
 
 
@@ -107,6 +112,7 @@ def save_user_credentials(request):
     if request.method == "GET":
         raise Http404
     payload = json.loads(request.body.decode('utf-8'))
+    # todo: Use email field from payload
     username = payload.get('username')
     password = payload.get('password')
     contact = payload.get('contact')
@@ -115,10 +121,12 @@ def save_user_credentials(request):
     try:
         user = User(username=username, password=password, contact=contact, latitude=latitude, longitude=longitude)
         user.save()
-        return JsonResponse({'Signup':'Success'})
-    except Exception as e:
-        print(e)
-    return JsonResponse({})
+        return HttpResponse("Successfully Signed up")
+    except IntegrityError as e:
+        print (e)
+        if 'unique' in str(e).lower():
+            return HttpResponse ("Username already exists")
+    return HttpResponse("Signup failed")
 
 
 @method_decorator(csrf_exempt)

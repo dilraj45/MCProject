@@ -6,5 +6,7 @@ urlpatterns = [
     #url(r'^$', SOSRequestHandler.as_view())
     url(r'^PostSOSRequest/$', post_sos_request),
     url(r'^UpdateLocation/$', update_lat_long),
-    url(r'DeleteSOSRequest/$', delete_sos_request)
+    url(r'^DeleteSOSRequest/$', delete_sos_request),
+    url(r'^AuthenticateCred/$', authenticate_user_credentials),
+    url(r'^SignUp/$', save_user_credentials)
 ]
