@@ -56,7 +56,9 @@ def get_open_sos_requests(request):
                 json_response = {
                     'message': request.message,
                     'username': request.user.username,
-                    'contact': request.user.contact
+                    'contact': request.user.contact,
+                    'latitude': request.user.latitude,
+                    'longitude': request.user.longitude
                 }
                 open_sos_requests.append(json_response)
     except Exception as e:

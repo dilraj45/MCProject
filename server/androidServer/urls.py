@@ -8,5 +8,6 @@ urlpatterns = [
     url(r'^UpdateLocation/$', update_lat_long),
     url(r'^DeleteSOSRequest/$', delete_sos_request),
     url(r'^AuthenticateCred/$', authenticate_user_credentials),
-    url(r'^SignUp/$', save_user_credentials)
+    url(r'^SignUp/$', save_user_credentials),
+    url(r'^OpenSOSRequest/$', get_open_sos_requests)
 ]
