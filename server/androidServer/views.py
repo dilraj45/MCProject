@@ -26,6 +26,8 @@ class SOSRequestHandler(View):
 
 def compute_distance(lat1, lon1, lat2, lon2):
     R = 6373.0
+    if lat1 is None or lon1 is None or lat2 is None or lon2 is None:
+        return 8888888888888
     lat1 = radians(lat1)
     lon1 = radians(lon1)
     lat2 = radians(lat2)
@@ -44,15 +46,15 @@ def get_open_sos_requests(request):
     auth_token = payload.get('token')
     distance = payload.get('distance', default=1)
     open_sos_requests = []
-    try:
-        user = SessionHandle.objects.get(authentication_token = auth_token).user
-        allocated_sos_request = []
-        for resolve_request in SOSRequestResolver.objects.filter(user=user.id):
-            allocated_sos_request.append(resolve_request.sos_request)
-        # todo: use values with dict = false
-        for request in SOSRequest.objects.all():
-            if compute_distance(user.latitude, user.longitude, request.user.latitude, request.user.longitude) \
-                    <= distance and request not in allocated_sos_request and user.id != request.user.id:
+    user = SessionHandle.objects.get(authentication_token = auth_token).user
+    allocated_sos_request = []
+    for resolve_request in SOSRequestResolver.objects.filter(user=user.id):
+        allocated_sos_request.append(resolve_request.sos_request)
+    # todo: use values with dict = false
+    for request in SOSRequest.objects.all():
+        if compute_distance(user.latitude, user.longitude, request.user.latitude, request.user.longitude) \
+                <= float(distance) and request not in allocated_sos_request and user.id != request.user.id:
+            try:
                 json_response = {
                     'message': request.message,
                     'username': request.user.username,
@@ -60,9 +62,10 @@ def get_open_sos_requests(request):
                     'latitude': request.user.latitude,
                     'longitude': request.user.longitude
                 }
-                open_sos_requests.append(json_response)
-    except Exception as e:
-        print(e)
+            except Exception as e:
+                print(e)
+            print (json_response)
+            open_sos_requests.append(json_response)
     return JsonResponse({"OpenSOSRequests": open_sos_requests})
 
 
@@ -125,7 +128,7 @@ def save_user_credentials(request):
         user.save()
         return HttpResponse("Successfully Signed up")
     except IntegrityError as e:
-        print (e)
+        print(e)
         if 'unique' in str(e).lower():
             return HttpResponse ("Username already exists")
     return HttpResponse("Signup failed")
@@ -176,3 +179,23 @@ def delete_sos_request(request):
     SOSRequest.objects.filter(user=user).delete()
     return HttpResponse("SOS Request successfully deleted!")
     print(e)
+
+
+def get_volunteers_list(request):
+    if request.method == "POST":
+        raise Http404
+    payload = request.GET
+    auth_token = payload.get('token')
+    user = SessionHandle.objects.get(authentication_token=auth_token).user
+    request_id = SOSRequest.objects.get(user=user).id
+    response = []
+    for entry in SOSRequestResolver.objects.filter(sos_request=request_id):
+        volunteer = entry.user
+        print(volunteer)
+        response.append({
+            'username': volunteer.username,
+            'contact': volunteer.contact,
+            'latitude': volunteer.latitude,
+            'longitude': volunteer.longitude
+        })
+    return JsonResponse({"Volunteers" : response})
